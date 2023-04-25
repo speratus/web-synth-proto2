@@ -9,7 +9,13 @@ async function setup() {
   let context =  new AudioContext();
   await context.audioWorklet.addModule('processor.js');
   let node = new AudioWorkletNode(context, 'web-synth-proto');
-  node.port.postMessage({type: 'init-wasm', wasmData: buf});
+
+  let cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+
+  cachedTextDecoder.decode();
+
+
+  node.port.postMessage({type: 'init-wasm', wasmData: buf, decoder: cachedTextDecoder});
   node.connect(context.destination);
 }
 

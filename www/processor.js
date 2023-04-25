@@ -2,9 +2,9 @@
 
 let wasm;
 
-const cachedTextDecoder = new TextDecoder('utf-8', { ignoreBOM: true, fatal: true });
+let cachedTextDecoder;
 
-cachedTextDecoder.decode();
+// cachedTextDecoder.decode();
 
 let cachedUint8Memory0 = null;
 
@@ -156,6 +156,8 @@ class WebSynthProcessor extends AudioWorkletProcessor {
 
         this.port.onmessage = event => this.onmessage(event.data);
         console.log(sampleRate);
+
+        this.osc = null;
     }
 
     onmessage(data) {
@@ -165,14 +167,18 @@ class WebSynthProcessor extends AudioWorkletProcessor {
                     // const imports = getImports();
                     console.log("instantiating wasm");
                     console.log('this:', this);
-                    let mod = await WebAssembly.instantiate(data.wasmData, {});
+                    cachedTextDecoder = data.decoder;
+                    // let mod = await WebAssembly.instantiate(data.wasmData, {});
+                    let mod = await load(data.wasmData, getImports());
                     this._wasm = mod;
-                    console.log('wasm instance', this._wasm);
+                    finalizeInit(mod.instance, mod.module);
+                    console.log('wasm instance', wasm);
 
                     // for (let i = 0; i < sampleRate; i++) {
                     //     let s = this._wasm.exports.samplex(440, 0.3, sampleRate, i);
                     //     console.log('sample', s);
                     // }
+                    this.osc = SineOsc.new(sampleRate);
                 } catch(e) {
                     console.log("Caught error in instantiating wasm", e);
                 }
@@ -185,13 +191,14 @@ class WebSynthProcessor extends AudioWorkletProcessor {
 
     process(inputs, outputs, parameters) {
 
-        if (typeof this._wasm !== 'undefined' && this._wasm !== null) {
+        if (typeof this.osc !== 'undefined' && this.osc !== null) {
             let output = outputs[0];
 
             output.forEach(channel => {
                 for (let i = 0; i < channel.length; i++) {
                     let pitch = 880;
-                    let sample = this._wasm.exports.samplex(pitch, 0.3, sampleRate, this.transport);
+                    // let sample = this._wasm.exports.samplex(pitch, 0.3, sampleRate, this.transport);
+                    let sample = this.osc.sample(440, 0.3);
 
                     // console.log('sample:', sample);
 
