@@ -1,5 +1,3 @@
-// import init, {getImports} from "/pkg/wasm_demo.js";
-
 let wasm;
 
 let cachedTextDecoder;
@@ -17,6 +15,67 @@ function getUint8Memory0() {
 
 function getStringFromWasm0(ptr, len) {
     return cachedTextDecoder.decode(getUint8Memory0().subarray(ptr, ptr + len));
+}
+
+let cachedFloat32Memory0 = null;
+
+function getFloat32Memory0() {
+    if (cachedFloat32Memory0 === null || cachedFloat32Memory0.byteLength === 0) {
+        cachedFloat32Memory0 = new Float32Array(wasm.memory.buffer);
+    }
+    return cachedFloat32Memory0;
+}
+
+let WASM_VECTOR_LEN = 0;
+
+function passArrayF32ToWasm0(arg, malloc) {
+    const ptr = malloc(arg.length * 4);
+    getFloat32Memory0().set(arg, ptr / 4);
+    WASM_VECTOR_LEN = arg.length;
+    return ptr;
+}
+/**
+*/
+export class OvertonalOsc {
+
+    static __wrap(ptr) {
+        const obj = Object.create(OvertonalOsc.prototype);
+        obj.ptr = ptr;
+
+        return obj;
+    }
+
+    __destroy_into_raw() {
+        const ptr = this.ptr;
+        this.ptr = 0;
+
+        return ptr;
+    }
+
+    free() {
+        const ptr = this.__destroy_into_raw();
+        wasm.__wbg_overtonalosc_free(ptr);
+    }
+    /**
+    * @param {number} sample_rate
+    * @param {Float32Array} overtones
+    * @returns {OvertonalOsc}
+    */
+    static new(sample_rate, overtones) {
+        const ptr0 = passArrayF32ToWasm0(overtones, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        const ret = wasm.overtonalosc_new(sample_rate, ptr0, len0);
+        return OvertonalOsc.__wrap(ret);
+    }
+    /**
+    * @param {number} pitch
+    * @param {number} gain
+    * @returns {number}
+    */
+    sample(pitch, gain) {
+        const ret = wasm.overtonalosc_sample(this.ptr, pitch, gain);
+        return ret;
+    }
 }
 /**
 */
@@ -107,6 +166,7 @@ function initMemory(imports, maybe_memory) {
 function finalizeInit(instance, module) {
     wasm = instance.exports;
     init.__wbindgen_wasm_module = module;
+    cachedFloat32Memory0 = null;
     cachedUint8Memory0 = null;
 
 
@@ -178,7 +238,7 @@ class WebSynthProcessor extends AudioWorkletProcessor {
                     //     let s = this._wasm.exports.samplex(440, 0.3, sampleRate, i);
                     //     console.log('sample', s);
                     // }
-                    this.osc = SineOsc.new(sampleRate);
+                    this.osc = OvertonalOsc.new(sampleRate, [0.5, 0.25, 0.125, 0.12, 0.11, 0.01]);
                 } catch(e) {
                     console.log("Caught error in instantiating wasm", e);
                 }
