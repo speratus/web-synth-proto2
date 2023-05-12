@@ -15,7 +15,7 @@ To build the Rust components of this project, simply run
 ```sh
 wasm-pack build --target web
 ```
-See [this post]https://dev.to/speratus/building-a-browser-based-synthesizer-using-rust-and-webassembly-3kpl for details regarding how to integrate it into a web page.
+See [this post](https://dev.to/speratus/building-a-browser-based-synthesizer-using-rust-and-webassembly-3kpl) for details regarding how to integrate it into a web page.
 
 ## Running
 This project can be run using Visual Studio Code's "Live Server" extension. Simply install it, and follow the instructions to go live.
