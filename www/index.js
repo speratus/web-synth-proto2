@@ -1,7 +1,7 @@
 let startBtn = document.getElementById('start-sound');
 
       async function setup() {
-        const bin = await WebAssembly.compileStreaming(await fetch('/www/wasm_demo.wasm'));
+        const bin = await WebAssembly.compileStreaming(await fetch('/www/wasm_demo_bg.wasm'));
         // const buf = await bin.arrayBuffer();
 
         let context =  new AudioContext();
