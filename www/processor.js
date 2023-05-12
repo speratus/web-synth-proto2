@@ -218,6 +218,8 @@ class WebSynthProcessor extends AudioWorkletProcessor {
         console.log(sampleRate);
 
         this.osc = null;
+
+        this.pitch = 440;
     }
 
     onmessage(data) {
@@ -238,7 +240,7 @@ class WebSynthProcessor extends AudioWorkletProcessor {
                     //     let s = this._wasm.exports.samplex(440, 0.3, sampleRate, i);
                     //     console.log('sample', s);
                     // }
-                    this.osc = OvertonalOsc.new(sampleRate, [0.5, 0.25, 0.125, 0.12, 0.11, 0.01]);
+                    this.osc = OvertonalOsc.new(sampleRate, [1.0, 0.5, 0.32, 0.25, 0.2, 0.16, 0.14, 0.13, 0.11, 0.1]);
                 } catch(e) {
                     console.log("Caught error in instantiating wasm", e);
                 }
@@ -246,6 +248,8 @@ class WebSynthProcessor extends AudioWorkletProcessor {
             console.log('received init');
             
             instance();
+        } else if (data.type == 'freq-update') {
+            this.pitch = data.freq;
         }
     }
 
@@ -258,7 +262,7 @@ class WebSynthProcessor extends AudioWorkletProcessor {
                 for (let i = 0; i < channel.length; i++) {
                     let pitch = 880;
                     // let sample = this._wasm.exports.samplex(pitch, 0.3, sampleRate, this.transport);
-                    let sample = this.osc.sample(440, 0.3);
+                    let sample = this.osc.sample(this.pitch, 0.05);
 
                     // console.log('sample:', sample);
 

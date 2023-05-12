@@ -19,12 +19,12 @@ pub struct SineOsc {
 
 #[wasm_bindgen]
 impl SineOsc {
-    pub fn sample(&mut self, pitch: i32, gain: f32) -> f32 {
-        let seed: f32 = ((2.0 * std::f32::consts::PI) / (self.sample_rate / pitch) as f32) * self.cycler as f32;
+    pub fn sample(&mut self, pitch: f64, gain: f64) -> f64 {
+        let seed: f64 = ((2.0 * std::f64::consts::PI) / (self.sample_rate as f64 / pitch)) * self.cycler as f64;
 
         self.cycler += 1;
 
-        if self.cycler > (self.sample_rate / pitch) {
+        if self.cycler as f64 > (self.sample_rate as f64 / pitch) {
             self.cycler = 0;
         }
 

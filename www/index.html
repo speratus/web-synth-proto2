@@ -28,6 +28,12 @@
         node.port.postMessage({type: 'init-wasm', wasmData: bin});
         node.connect(context.destination);
 
+        let freq = document.getElementById('frequency-input');
+
+        freq.addEventListener('change', () => {
+          node.port.postMessage({type: 'freq-update', freq: freq.value});
+        });
+
         let stopBtn = document.getElementById('stop-sound');
         stopBtn.addEventListener('click', () => {
           context.close();
@@ -40,5 +46,9 @@
     </script>
     <button id="start-sound">Start Sound</button>
     <button id="stop-sound">Stop Sound</button>
+    <label>
+      Frequency: 
+      <input type="number" value="440" id="frequency-input">
+    </label>
   </body>
 </html>
