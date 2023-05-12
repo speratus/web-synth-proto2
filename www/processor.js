@@ -36,49 +36,6 @@ function passArrayF32ToWasm0(arg, malloc) {
 }
 /**
 */
-export class OvertonalOsc {
-
-    static __wrap(ptr) {
-        const obj = Object.create(OvertonalOsc.prototype);
-        obj.ptr = ptr;
-
-        return obj;
-    }
-
-    __destroy_into_raw() {
-        const ptr = this.ptr;
-        this.ptr = 0;
-
-        return ptr;
-    }
-
-    free() {
-        const ptr = this.__destroy_into_raw();
-        wasm.__wbg_overtonalosc_free(ptr);
-    }
-    /**
-    * @param {number} sample_rate
-    * @param {Float32Array} overtones
-    * @returns {OvertonalOsc}
-    */
-    static new(sample_rate, overtones) {
-        const ptr0 = passArrayF32ToWasm0(overtones, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.overtonalosc_new(sample_rate, ptr0, len0);
-        return OvertonalOsc.__wrap(ret);
-    }
-    /**
-    * @param {number} pitch
-    * @param {number} gain
-    * @returns {number}
-    */
-    sample(pitch, gain) {
-        const ret = wasm.overtonalosc_sample(this.ptr, pitch, gain);
-        return ret;
-    }
-}
-/**
-*/
 export class SineOsc {
 
     static __wrap(ptr) {
@@ -211,11 +168,8 @@ class WebSynthProcessor extends AudioWorkletProcessor {
 
     constructor(options) {
         super(options);
-        this.cycler = 0;
-        this.transport = 0;
 
         this.port.onmessage = event => this.onmessage(event.data);
-        console.log(sampleRate);
 
         this.osc = null;
 
@@ -226,21 +180,13 @@ class WebSynthProcessor extends AudioWorkletProcessor {
         if (data.type === 'init-wasm') {
             const instance = async () => {
                 try {
-                    // const imports = getImports();
-                    console.log("instantiating wasm");
-                    console.log('this:', this);
                     cachedTextDecoder = data.decoder;
-                    // let mod = await WebAssembly.instantiate(data.wasmData, {});
-                    let mod = await load(data.wasmData, getImports());
-                    this._wasm = mod;
-                    finalizeInit(mod.instance, mod.module);
-                    console.log('wasm instance', wasm);
 
-                    // for (let i = 0; i < sampleRate; i++) {
-                    //     let s = this._wasm.exports.samplex(440, 0.3, sampleRate, i);
-                    //     console.log('sample', s);
-                    // }
-                    this.osc = OvertonalOsc.new(sampleRate, [1.0, 0.5, 0.32, 0.25, 0.2, 0.16, 0.14, 0.13, 0.11, 0.1]);
+                    let mod = await load(data.wasmData, getImports());
+                    finalizeInit(mod.instance, mod.module);
+
+
+                    this.osc = SineOsc.new(sampleRate);
                 } catch(e) {
                     console.log("Caught error in instantiating wasm", e);
                 }
@@ -260,26 +206,10 @@ class WebSynthProcessor extends AudioWorkletProcessor {
 
             output.forEach(channel => {
                 for (let i = 0; i < channel.length; i++) {
-                    let pitch = 880;
-                    // let sample = this._wasm.exports.samplex(pitch, 0.3, sampleRate, this.transport);
+
                     let sample = this.osc.sample(this.pitch, 0.05);
 
-                    // console.log('sample:', sample);
-
                     channel[i] = sample;
-
-                    this.cycler += 1;
-                    this.transport += 1;
-
-                    let resetPoint = Math.ceil(sampleRate / pitch);
-
-                    if (this.transport > this.resetPoint) {
-                        this.transport = 0;
-                    }
-
-                    if (this.cycler > sampleRate) {
-                        this.cycler = 0;
-                    }
                 }
             });
 
