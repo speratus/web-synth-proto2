@@ -6,8 +6,8 @@ You can read an introductiont to the project on [dev.to](https://dev.to/speratus
 ## Dependencies
 To build this project you will need the following:
 
-* Rust
-* wasm-pack
+* [Rust](https://www.rust-lang.org/)
+* [wasm-pack](https://rustwasm.github.io/wasm-pack/installer/)
 
 ## Building
 To build the Rust components of this project, simply run
