@@ -26,6 +26,7 @@ Although I haven't thoroughly tested this method, I don't think you will run int
 
 ## License
 This software generates a simple tone using WebAssembly and the Web Audio API.
+
 Copyright (C) 2023  Andrew Luchuk
 
 This program is free software: you can redistribute it and/or modify
