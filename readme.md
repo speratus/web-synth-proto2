@@ -24,7 +24,7 @@ Once you have the server running, navigate to the "www" directory to see the web
 If you don't have Visual Studio Code, you should also be able to open `index.html` in the `www` directory in any modern web browser.
 Although I haven't thoroughly tested this method, I don't think you will run into any problems running the project this way.
 
-## License
+## GNU GPLv3 License
 This software generates a simple tone using WebAssembly and the Web Audio API.
 
 Copyright (C) 2023  Andrew Luchuk
